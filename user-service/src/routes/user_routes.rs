@@ -1,7 +1,7 @@
-use axum::Router;
+use axum::{Router, routing::post};
 
-use crate::state::AppState;
+use crate::{handlers::user_handler, state::AppState};
 
 pub fn user_routes() -> Router<AppState> {
-    Router::new().route("/", axum::routing::get(|| async { "Users" }))
+    Router::new().route("/", post(user_handler::create_user))
 }

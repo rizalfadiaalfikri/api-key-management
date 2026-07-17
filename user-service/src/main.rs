@@ -10,6 +10,11 @@ pub mod errors;
 pub mod settings;
 pub mod utils;
 pub mod routes;
+pub mod models;
+pub mod repositories;
+pub mod dto;
+pub mod services;
+pub mod handlers;
 
 
 
