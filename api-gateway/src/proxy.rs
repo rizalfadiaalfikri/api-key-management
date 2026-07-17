@@ -80,6 +80,12 @@ fn resolve_target_base<'a>(
 ) -> Option<&'a str> {
     if path.starts_with("/api/auth") {
         Some(&state.config.auth_url)
+    } else if path.starts_with("/api/users") {
+        Some(&state.config.user_url)
+    } else if path.starts_with("/api/keys") {
+        Some(&state.config.key_url)
+    } else if path.starts_with("/api/logs") {
+        Some(&state.config.log_url)
     } else {
         None
     }

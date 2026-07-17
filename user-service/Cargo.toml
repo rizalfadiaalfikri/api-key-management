@@ -15,7 +15,8 @@ jsonwebtoken = { version = "10.4.0", features = ["rust_crypto"] }
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.150"
 sqlx = { version = "0.9.0", features = ["runtime-tokio", "tls-rustls", "postgres", "macros", "uuid", "chrono"] }
-tokio = "1.53.0"
+thiserror = "2.0.18"
+tokio = { version = "1.53.0", features = ["rt-multi-thread", "macros"] }
 tower-http = { version = "0.7.0", features = ["cors", "trace"] }
 tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
