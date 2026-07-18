@@ -38,6 +38,9 @@ pub struct UpdateUserDto {
     #[validate(length(min = 1, max = 255))]
     pub role: String,
 
+    #[validate(length(min = 1, max = 255))]
+    pub status: String,
+
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow, ToSchema)]

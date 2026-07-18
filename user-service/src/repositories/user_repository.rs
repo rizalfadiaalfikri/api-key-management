@@ -1,8 +1,8 @@
 use anyhow::Result;
-use sqlx::PgPool;
+use sqlx::{PgPool};
 use uuid::Uuid;
 
-use crate::dto::user_dto::{CreateUserDto, UserDto};
+use crate::dto::user_dto::{CreateUserDto, UpdateUserDto, UserDto};
 use crate::errors::app_error::AppError;
 use crate::models::user::User;
 
@@ -80,4 +80,41 @@ pub async fn get_all_users(pool: &PgPool) -> Result<Vec<UserDto>, AppError> {
     .await?;
 
     Ok(users)
+}
+
+pub async fn update_user_by_id(pool: &PgPool, id: Uuid, payload: UpdateUserDto) -> Result<User, AppError> {
+    let mut tx = pool.begin().await?;
+
+    let user = sqlx::query_as!(
+        User,
+        r#"
+        UPDATE users
+        SET full_name = $1, email = $2, role = $3, status = $4
+        WHERE id = $5
+        RETURNING *
+        "#,
+        payload.full_name,
+        payload.email,
+        payload.role,
+        payload.status,
+        id,
+    )
+    .fetch_one(&mut *tx)
+    .await?;
+
+    sqlx::query!(
+        r#"
+        UPDATE credentials
+        SET password_hash = $1
+        WHERE user_id = $2
+        "#,
+        payload.password,
+        id,
+    )
+    .execute(&mut *tx)
+    .await?;
+
+    tx.commit().await?;
+
+    Ok(user)
 }

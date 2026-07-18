@@ -8,7 +8,7 @@ use serde::Deserialize;
 use uuid::Uuid;
 use validator::Validate;
 
-use crate::{dto::{api_response::ApiResponse, user_dto::{CreateUserDto, UserDto}}, errors::app_error::AppError, models::user::User, services::user_service, state::AppState};
+use crate::{dto::{api_response::ApiResponse, user_dto::{CreateUserDto, UpdateUserDto, UserDto}}, errors::app_error::AppError, models::user::User, services::user_service, state::AppState};
 
 pub async fn create_user(
     State(state): State<AppState>,
@@ -72,4 +72,23 @@ pub async fn get_users(
         data: Some(users),
     };
     Ok(Json(serde_json::to_value(api).map_err(|e| AppError::InternalServerError(e.to_string()))?))
+}
+
+
+pub async fn update_user_by_id(
+    State(state): State<AppState>,
+    Path(id): Path<Uuid>,
+    Json(payload): Json<UpdateUserDto>
+) -> Result<Json<ApiResponse<User>>, AppError>{
+    payload.validate()
+        .map_err(|err| AppError::ValidationError(err.to_string()))?;
+
+    let user = user_service::update_user_by_id(&state.db, id, payload).await?;
+
+    Ok(Json(ApiResponse::<User> {
+        success: true,
+        status: 200,
+        message: "User updated successfully".to_string(),
+        data: Some(user),
+    }))
 }
