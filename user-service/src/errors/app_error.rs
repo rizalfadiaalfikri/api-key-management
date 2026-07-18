@@ -30,8 +30,8 @@ pub enum AppError {
     #[error("Conflict")]
     Conflict,
 
-    #[error("Bad request")]
-    BadRequest,
+    #[error("Bad request: {0}")]
+    BadRequest(String),
 }
 
 impl IntoResponse for AppError {
@@ -44,7 +44,7 @@ impl IntoResponse for AppError {
             AppError::Forbidden => (StatusCode::FORBIDDEN, "Forbidden".to_string()),
             AppError::NotFound => (StatusCode::NOT_FOUND, "Not found".to_string()),
             AppError::Conflict => (StatusCode::CONFLICT, "Conflict".to_string()),
-            AppError::BadRequest => (StatusCode::BAD_REQUEST, "Bad request".to_string()),
+            AppError::BadRequest(msg) => (StatusCode::BAD_REQUEST, msg),
         };
 
         let body = Json(json!({

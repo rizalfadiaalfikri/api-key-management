@@ -55,3 +55,13 @@ pub struct UserDto {
     pub created_at: DateTime<Utc>,
     pub updated_at: Option<DateTime<Utc>>
 }
+
+#[derive(Debug, Serialize, Deserialize, ToSchema, Validate)]
+pub struct ChangePasswordDto {
+
+    #[validate(length(min = 1, max = 255))]
+    pub old_password: String,
+
+    #[validate(length(min = 1, max = 255))]
+    pub new_password: String,
+}
