@@ -1,5 +1,7 @@
+use std::collections::HashMap;
+
 use anyhow::Result;
-use axum::{Json, extract::{Path, State}, http::StatusCode};
+use axum::{Json, extract::{Path, Query, State}, http::StatusCode};
 use uuid::Uuid;
 use validator::Validate;
 
@@ -30,6 +32,21 @@ pub async fn get_user_by_id(
     Path(id): Path<Uuid>
 ) -> Result<Json<ApiResponse<UserDto>>, AppError> {
     let user = user_service::get_user_by_id(&state.db, id).await?;
+
+    Ok(Json(ApiResponse::<UserDto> {
+        success: true,
+        status: 200,
+        message: "User retrieved successfully".to_string(),
+        data: Some(user),
+    }))
+}
+
+pub async fn get_user_by_email(
+    State(state): State<AppState>,
+    Query(params): Query<HashMap<String, String>>,
+) -> Result<Json<ApiResponse<UserDto>>, AppError> {
+    let email = params.get("email").cloned().ok_or(AppError::BadRequest)?;
+    let user = user_service::get_user_by_email(&state.db, &email).await?;
 
     Ok(Json(ApiResponse::<UserDto> {
         success: true,

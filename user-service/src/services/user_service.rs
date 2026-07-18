@@ -25,3 +25,11 @@ pub async fn get_user_by_id(pool: &PgPool, id: Uuid) -> Result<UserDto, AppError
         .ok_or(AppError::NotFound)?;
     Ok(user)
 }
+
+pub async fn get_user_by_email(pool: &PgPool, email: &str) -> Result<UserDto, AppError> {
+    let user = user_repository::get_user_by_email(pool, email)
+        .await?
+        .ok_or(AppError::NotFound)?;
+
+    Ok(user)
+}
