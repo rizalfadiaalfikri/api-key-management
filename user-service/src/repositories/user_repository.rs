@@ -68,3 +68,16 @@ pub async fn get_user_by_email(pool: &PgPool, email: &str) -> Result<Option<User
 
     Ok(user)
 }
+
+pub async fn get_all_users(pool: &PgPool) -> Result<Vec<UserDto>, AppError> {
+    let users = sqlx::query_as::<_, UserDto>(
+        r#"
+        SELECT u.id, u.full_name, u.role, u.email, c.password_hash, c.last_login_at, u.status, u.created_at, u.updated_at
+        FROM users u
+        LEFT JOIN credentials c ON c.user_id = u.id
+        "#
+    ).fetch_all(pool)
+    .await?;
+
+    Ok(users)
+}

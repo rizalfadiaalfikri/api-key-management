@@ -33,3 +33,10 @@ pub async fn get_user_by_email(pool: &PgPool, email: &str) -> Result<UserDto, Ap
 
     Ok(user)
 }
+
+pub async fn get_all_users(pool: &PgPool) -> Result<Vec<UserDto>, AppError> {
+    let users = user_repository::get_all_users(pool)
+        .await?;
+
+    Ok(users)
+}

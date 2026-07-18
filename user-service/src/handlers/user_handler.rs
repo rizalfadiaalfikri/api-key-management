@@ -1,7 +1,10 @@
-use std::collections::HashMap;
-
 use anyhow::Result;
-use axum::{Json, extract::{Path, Query, State}, http::StatusCode};
+use axum::{
+    Json,
+    extract::{Path, Query, State},
+    http::StatusCode,
+};
+use serde::Deserialize;
 use uuid::Uuid;
 use validator::Validate;
 
@@ -41,17 +44,32 @@ pub async fn get_user_by_id(
     }))
 }
 
-pub async fn get_user_by_email(
-    State(state): State<AppState>,
-    Query(params): Query<HashMap<String, String>>,
-) -> Result<Json<ApiResponse<UserDto>>, AppError> {
-    let email = params.get("email").cloned().ok_or(AppError::BadRequest)?;
-    let user = user_service::get_user_by_email(&state.db, &email).await?;
+#[derive(Deserialize)]
+pub struct GetUsersParams {
+    email: Option<String>,
+}
 
-    Ok(Json(ApiResponse::<UserDto> {
+pub async fn get_users(
+    State(state): State<AppState>,
+    params: Query<GetUsersParams>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    if let Some(email) = &params.email {
+        let user = user_service::get_user_by_email(&state.db, email).await?;
+        let api = ApiResponse::<UserDto> {
+            success: true,
+            status: 200,
+            message: "User retrieved successfully".to_string(),
+            data: Some(user),
+        };
+        return Ok(Json(serde_json::to_value(api).map_err(|e| AppError::InternalServerError(e.to_string()))?));
+    }
+
+    let users = user_service::get_all_users(&state.db).await?;
+    let api = ApiResponse::<Vec<UserDto>> {
         success: true,
         status: 200,
-        message: "User retrieved successfully".to_string(),
-        data: Some(user),
-    }))
+        message: "Users retrieved successfully".to_string(),
+        data: Some(users),
+    };
+    Ok(Json(serde_json::to_value(api).map_err(|e| AppError::InternalServerError(e.to_string()))?))
 }
