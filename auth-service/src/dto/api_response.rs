@@ -1,8 +1,8 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-#[derive(Debug, Clone, Deserialize)]
-pub struct ApiRespinse<T>
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ApiResponse<T>
 where 
     T: ToSchema
 {

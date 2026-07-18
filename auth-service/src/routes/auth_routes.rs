@@ -1,8 +1,8 @@
-use axum::{Router, routing::{get, post}};
+use axum::{Router, routing::{post}};
 
-use crate::state::AppState;
+use crate::{handlers::auth_handler, state::AppState};
 
 pub fn auth_routes() -> Router<AppState> {
     Router::new()
-        .route("/login", get(|| async { "login" }))
+        .route("/login", post(auth_handler::login))
 }
