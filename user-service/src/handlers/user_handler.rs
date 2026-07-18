@@ -8,7 +8,7 @@ use serde::Deserialize;
 use uuid::Uuid;
 use validator::Validate;
 
-use crate::{dto::{api_response::ApiResponse, user_dto::{CreateUserDto, UpdateUserDto, UserDto}}, errors::app_error::AppError, models::user::User, services::user_service, state::AppState};
+use crate::{dto::{api_response::ApiResponse, user_dto::{CreateUserDto, UpdateUserDto, UserDto}}, errors::app_error::AppError, models::user::User, services::user_service, state::{AppState}};
 
 pub async fn create_user(
     State(state): State<AppState>,
@@ -89,6 +89,20 @@ pub async fn update_user_by_id(
         success: true,
         status: 200,
         message: "User updated successfully".to_string(),
+        data: Some(user),
+    }))
+}
+
+pub async fn delete_user_by_id(
+    State(state): State<AppState>,
+    Path(id): Path<Uuid>
+) -> Result<Json<ApiResponse<User>>, AppError> {
+    let user = user_service::delete_user_by_id(&state.db, id).await?;
+
+    Ok(Json(ApiResponse::<User> {
+        success: true,
+        status: 200,
+        message: "User deleted successfully".to_string(),
         data: Some(user),
     }))
 }

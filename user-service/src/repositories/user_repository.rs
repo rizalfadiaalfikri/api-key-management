@@ -118,3 +118,33 @@ pub async fn update_user_by_id(pool: &PgPool, id: Uuid, payload: UpdateUserDto) 
 
     Ok(user)
 }
+
+pub async fn delete_user_by_id(pool: &PgPool, id: Uuid) -> Result<User, AppError> {
+    let mut tx = pool.begin().await?;
+
+    let user = sqlx::query_as!(
+        User,
+        r#"
+        DELETE FROM users
+        WHERE id = $1
+        RETURNING *
+        "#,
+        id,
+    )
+    .fetch_one(&mut *tx)
+    .await?;
+
+    sqlx::query!(
+        r#"
+        DELETE FROM credentials
+        WHERE user_id = $1
+        "#,
+        id,
+    )
+    .execute(&mut *tx)
+    .await?;
+
+    tx.commit().await?;
+
+    Ok(user)
+}

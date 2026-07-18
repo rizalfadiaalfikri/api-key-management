@@ -8,5 +8,7 @@ pub fn user_routes() -> Router<AppState> {
         .route("/", get(user_handler::get_users))
         .route("/{id}", 
             get(user_handler::get_user_by_id)
-            .put(user_handler::update_user_by_id))
+            .put(user_handler::update_user_by_id)
+            .delete(user_handler::delete_user_by_id)
+        )
 }

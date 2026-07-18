@@ -60,3 +60,15 @@ pub async fn update_user_by_id(pool: &PgPool, id: Uuid, payload: UpdateUserDto) 
 
     Ok(user)
 }
+
+pub async fn delete_user_by_id(pool: &PgPool, id: Uuid) -> Result<User, AppError> {
+    // Get User By Id
+    user_repository::get_user_by_id(pool, id)
+        .await?
+        .ok_or(AppError::NotFound)?;
+
+    // Delete User
+    let user = user_repository::delete_user_by_id(pool, id).await?;
+
+    Ok(user)
+}
